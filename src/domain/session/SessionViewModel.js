@@ -26,6 +26,7 @@ import {RoomGridViewModel} from "./RoomGridViewModel.js";
 import {SettingsViewModel} from "./settings/SettingsViewModel.js";
 import {ViewModel} from "../ViewModel.js";
 import {RoomViewModelObservable} from "./RoomViewModelObservable.js";
+import {MemberListViewModel} from "./rightpanel/MemberListViewModel.js";
 
 export class SessionViewModel extends ViewModel {
     constructor(options) {
@@ -84,6 +85,10 @@ export class SessionViewModel extends ViewModel {
         const details = this.navigation.observe("details");
         this.track(details.subscribe(() => this._updateRoomDetails()));
         this._updateRoomDetails();
+
+        const members = this.navigation.observe("members");
+        this.track(members.subscribe(() => this._toggleMemberListPanel()));
+        this._toggleMemberListPanel();
     }
 
     get id() {
@@ -120,6 +125,10 @@ export class SessionViewModel extends ViewModel {
 
     get roomDetailsViewModel() {
         return this._roomDetailsViewModel;
+    }
+
+    get memberListViewModel() {
+        return this._memberListViewModel;
     }
 
     _updateGrid(roomIds) {
@@ -267,4 +276,17 @@ export class SessionViewModel extends ViewModel {
         this.emitChange("roomDetailsViewModel");
     }
 
+    async _toggleMemberListPanel() {
+        this._memberListViewModel = this.disposeTracked(this._memberListViewModel);
+        const enable = !!this.navigation.path.get("members")?.value;
+        if (enable) {
+            const room = this._roomFromNavigation();
+            const list = await room.loadMemberList();
+            const members = list.members;
+            this._memberListViewModel = this.track(
+                new MemberListViewModel(this.childOptions({members}))
+            );
+        }
+        this.emitChange("memberListViewModel");
+    }
 }

@@ -26,6 +26,7 @@ import {SessionStatusView} from "./SessionStatusView.js";
 import {RoomGridView} from "./RoomGridView.js";
 import {SettingsView} from "./settings/SettingsView.js";
 import {RoomDetailsView} from "./rightpanel/RoomDetailsView.js";
+import {MemberListView} from "./rightpanel/MemberListView.js";
 
 export class SessionView extends TemplateView {
     render(t, vm) {
@@ -56,6 +57,7 @@ export class SessionView extends TemplateView {
                 }
             }),
             t.mapView(vm => vm.roomDetailsViewModel, roomDetailsViewModel => roomDetailsViewModel ? new RoomDetailsView(roomDetailsViewModel) : null),
+            t.mapView(vm => vm.memberListViewModel, memberListViewModel => memberListViewModel ? new MemberListView(memberListViewModel) : null),
             t.mapView(vm => vm.lightboxViewModel, lightboxViewModel => lightboxViewModel ? new LightboxView(lightboxViewModel) : null)
         ]);
     }
