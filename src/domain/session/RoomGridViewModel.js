@@ -83,6 +83,7 @@ export class RoomGridViewModel extends ViewModel {
         let path = this.navigation.path.until("rooms");
         path = path.with(this.navigation.segment("room", roomId));
         if (detailsShown) {
+            path = path.with(this.navigation.segment("rightpanel", true));
             path = path.with(this.navigation.segment("details", true));
         }
         this.navigation.applyPath(path);

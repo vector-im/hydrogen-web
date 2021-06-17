@@ -290,6 +290,7 @@ export class RoomViewModel extends ViewModel {
 
     openDetailsPanel() {
         let path = this.navigation.path.until("room");
+        path = path.with(this.navigation.segment("rightpanel", true));
         path = path.with(this.navigation.segment("details", true));
         this.navigation.applyPath(path);
     }
