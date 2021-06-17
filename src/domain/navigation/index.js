@@ -37,9 +37,9 @@ function allowsChild(parent, child) {
             // downside of the approach: both of these will control which tile is selected
             return type === "room" || type === "empty-grid-tile";
         case "room":
-            return type === "lightbox" || type === "members" || type === "rightpanel";
+            return type === "lightbox" || type === "rightpanel";
         case "rightpanel":
-            return type === "details";
+            return type === "details"|| type === "members";
         default:
             return false;
     }
@@ -130,6 +130,10 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
         } else if (type === "details") {
             segments.push(new Segment("rightpanel"));
             segments.push(new Segment("details"));
+        } else if (type === "members") {
+            //TODO: Fix duplication here.
+            segments.push(new Segment("rightpanel"));
+            segments.push(new Segment("members"));
         } else {
             // might be undefined, which will be turned into true by Segment 
             const value = iterator.next().value;
