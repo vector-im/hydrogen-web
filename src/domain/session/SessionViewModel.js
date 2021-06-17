@@ -17,7 +17,6 @@ limitations under the License.
 
 import {LeftPanelViewModel} from "./leftpanel/LeftPanelViewModel.js";
 import {RoomViewModel} from "./room/RoomViewModel.js";
-import {RoomDetailsViewModel} from "./rightpanel/RoomDetailsViewModel.js";
 import {UnknownRoomViewModel} from "./room/UnknownRoomViewModel.js";
 import {InviteViewModel} from "./room/InviteViewModel.js";
 import {LightboxViewModel} from "./room/LightboxViewModel.js";
@@ -27,6 +26,7 @@ import {SettingsViewModel} from "./settings/SettingsViewModel.js";
 import {ViewModel} from "../ViewModel.js";
 import {RoomViewModelObservable} from "./RoomViewModelObservable.js";
 import {MemberListViewModel} from "./rightpanel/MemberListViewModel.js";
+import { RightPanelViewModel } from "./rightpanel/RightPanelViewModel.js";
 
 export class SessionViewModel extends ViewModel {
     constructor(options) {
@@ -64,7 +64,7 @@ export class SessionViewModel extends ViewModel {
             if (!this._gridViewModel) {
                 this._updateRoom(roomId);
             }
-            this._updateRoomDetails();
+            this._updateRightPanel();
         }));
         if (!this._gridViewModel) {
             this._updateRoom(currentRoomId.get());
@@ -82,13 +82,13 @@ export class SessionViewModel extends ViewModel {
         }));
         this._updateLightbox(lightbox.get());
 
-        const details = this.navigation.observe("details");
-        this.track(details.subscribe(() => this._updateRoomDetails()));
-        this._updateRoomDetails();
+        // const members = this.navigation.observe("members");
+        // this.track(members.subscribe(() => this._toggleMemberListPanel()));
+        // this._toggleMemberListPanel();
 
-        const members = this.navigation.observe("members");
-        this.track(members.subscribe(() => this._toggleMemberListPanel()));
-        this._toggleMemberListPanel();
+        const rightpanel = this.navigation.observe("rightpanel");
+        this.track(rightpanel.subscribe(() => this._updateRightPanel()));
+        this._updateRightPanel();
     }
 
     get id() {
@@ -123,12 +123,12 @@ export class SessionViewModel extends ViewModel {
         return this._roomViewModelObservable?.get();
     }
 
-    get roomDetailsViewModel() {
-        return this._roomDetailsViewModel;
-    }
-
     get memberListViewModel() {
         return this._memberListViewModel;
+    }
+
+    get rightPanelViewModel() {
+        return this._rightPanelViewModel;
     }
 
     _updateGrid(roomIds) {
@@ -265,17 +265,6 @@ export class SessionViewModel extends ViewModel {
         return room;
     }
 
-    _updateRoomDetails() {
-        this._roomDetailsViewModel = this.disposeTracked(this._roomDetailsViewModel);
-        const enable = !!this.navigation.path.get("details")?.value;
-        if (enable) {
-            const room = this._roomFromNavigation();
-            if (!room) { return; }
-            this._roomDetailsViewModel = this.track(new RoomDetailsViewModel(this.childOptions({room})));
-        }
-        this.emitChange("roomDetailsViewModel");
-    }
-
     async _toggleMemberListPanel() {
         this._memberListViewModel = this.disposeTracked(this._memberListViewModel);
         const enable = !!this.navigation.path.get("members")?.value;
@@ -289,4 +278,15 @@ export class SessionViewModel extends ViewModel {
         }
         this.emitChange("memberListViewModel");
     }
+
+    _updateRightPanel() {
+        this._rightPanelViewModel = this.disposeTracked(this._rightPanelViewModel);
+        const enable = !!this.navigation.path.get("rightpanel")?.value;
+        if (enable) {
+            const room = this._roomFromNavigation();
+            this._rightPanelViewModel = this.track(new RightPanelViewModel(this.childOptions({room})));
+        }
+        this.emitChange("rightPanelViewModel");
+    }
+
 }
