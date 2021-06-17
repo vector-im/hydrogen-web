@@ -1,6 +1,10 @@
-.RoomDetailsView {
+.RightPanelView{
     grid-area: right;
+}
+
+.RoomDetailsView {
     flex-direction: column;
+    height: 100%;
 }
 
 .RoomDetailsView_avatar {
