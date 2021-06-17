@@ -33,3 +33,8 @@
     justify-content: flex-end;
     width: 100%;
 }
+
+ul.MemberListView {
+    overflow: scroll;
+    height: 100vh;
+}
