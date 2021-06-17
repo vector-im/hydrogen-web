@@ -25,8 +25,7 @@ import {RoomGridViewModel} from "./RoomGridViewModel.js";
 import {SettingsViewModel} from "./settings/SettingsViewModel.js";
 import {ViewModel} from "../ViewModel.js";
 import {RoomViewModelObservable} from "./RoomViewModelObservable.js";
-import {MemberListViewModel} from "./rightpanel/MemberListViewModel.js";
-import { RightPanelViewModel } from "./rightpanel/RightPanelViewModel.js";
+import {RightPanelViewModel} from "./rightpanel/RightPanelViewModel.js";
 
 export class SessionViewModel extends ViewModel {
     constructor(options) {
@@ -82,9 +81,6 @@ export class SessionViewModel extends ViewModel {
         }));
         this._updateLightbox(lightbox.get());
 
-        // const members = this.navigation.observe("members");
-        // this.track(members.subscribe(() => this._toggleMemberListPanel()));
-        // this._toggleMemberListPanel();
 
         const rightpanel = this.navigation.observe("rightpanel");
         this.track(rightpanel.subscribe(() => this._updateRightPanel()));
@@ -123,9 +119,6 @@ export class SessionViewModel extends ViewModel {
         return this._roomViewModelObservable?.get();
     }
 
-    get memberListViewModel() {
-        return this._memberListViewModel;
-    }
 
     get rightPanelViewModel() {
         return this._rightPanelViewModel;
@@ -263,20 +256,6 @@ export class SessionViewModel extends ViewModel {
         const roomId = this.navigation.path.get("room")?.value;
         const room = this._sessionContainer.session.rooms.get(roomId);
         return room;
-    }
-
-    async _toggleMemberListPanel() {
-        this._memberListViewModel = this.disposeTracked(this._memberListViewModel);
-        const enable = !!this.navigation.path.get("members")?.value;
-        if (enable) {
-            const room = this._roomFromNavigation();
-            const list = await room.loadMemberList();
-            const members = list.members;
-            this._memberListViewModel = this.track(
-                new MemberListViewModel(this.childOptions({members}))
-            );
-        }
-        this.emitChange("memberListViewModel");
     }
 
     _updateRightPanel() {
