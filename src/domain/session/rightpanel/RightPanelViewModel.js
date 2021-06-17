@@ -1,5 +1,6 @@
 import {ViewModel} from "../../ViewModel.js";
 import {RoomDetailsViewModel} from "./RoomDetailsViewModel.js";
+import {MemberListViewModel} from "./MemberListViewModel.js";
 
 export class RightPanelViewModel extends ViewModel {
     constructor(options) {
@@ -9,11 +10,16 @@ export class RightPanelViewModel extends ViewModel {
     }
 
     get roomDetailsViewModel() { return this._roomDetailsViewModel; }
+    get memberListViewModel() { return this._memberListViewModel; }
 
     _setupNavigation() {
         const details = this.navigation.observe("details");
         this.track(details.subscribe(() => this._toggleRoomDetailsPanel()));
         this._toggleRoomDetailsPanel();
+
+        const members = this.navigation.observe("members");
+        this.track(members.subscribe(() => this._toggleMemberListPanel()));
+        this._toggleMemberListPanel();
     }
 
     _toggleRoomDetailsPanel() {
@@ -24,5 +30,18 @@ export class RightPanelViewModel extends ViewModel {
             this._roomDetailsViewModel = this.track(new RoomDetailsViewModel(this.childOptions({room})));
         }
         this.emitChange("roomDetailsViewModel");
+    }
+
+    async _toggleMemberListPanel() {
+        this._memberListViewModel = this.disposeTracked(this._memberListViewModel);
+        const enable = !!this.navigation.path.get("members")?.value;
+        if (enable) {
+            const list = await this._room.loadMemberList();
+            const members = list.members;
+            this._memberListViewModel = this.track(
+                new MemberListViewModel(this.childOptions({members}))
+            );
+        }
+        this.emitChange("memberListViewModel");
     }
 }
