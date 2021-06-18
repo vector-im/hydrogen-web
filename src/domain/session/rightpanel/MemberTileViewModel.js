@@ -6,8 +6,8 @@ export class MemberTileViewModel extends ViewModel {
         this._member = options.member;
     }
 
-    get displayName() {
-        return this._member.displayName;
+    get name() {
+        return this._member.name;
     }
 
     get userId() {
