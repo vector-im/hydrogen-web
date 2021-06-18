@@ -1,15 +1,12 @@
 import {ViewModel} from "../../ViewModel.js";
 import {MemberTileViewModel} from "./MemberTileViewModel.js";
-
-function comparator(member, otherMember) {
-    return member.displayName?.localeCompare(otherMember.displayName);
-}
+import {createMemberComparator} from "./comparator.js";
 
 export class MemberListViewModel extends ViewModel {
     constructor(options) {
         super(options);
         this.memberTileViewModels = this._mapTileViewModels(this._filterJoinedMembers(options.members))
-                                        .sortValues(comparator);
+                                        .sortValues(createMemberComparator(options.powerLevels));
     }
 
     _filterJoinedMembers(members) {
