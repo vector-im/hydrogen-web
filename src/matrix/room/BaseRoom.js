@@ -378,6 +378,10 @@ export class BaseRoom extends EventEmitter {
         return this._summary.data.membership;
     }
 
+    get powerLevels() {
+        return this._timeline.powerLevels;
+    }
+
     enableSessionBackup(sessionBackup) {
         this._roomEncryption?.enableSessionBackup(sessionBackup);
         // TODO: do we really want to do this every time you open the app?
