@@ -19,6 +19,18 @@ export class SettingsStorage {
         this._prefix = prefix;
     }
 
+    async setString(key, value) {
+        this._set(key, value);
+    }
+
+    async getString(key, defaultValue = "") {
+        const value = window.localStorage.getItem(`${this._prefix}${key}`);
+        if (typeof value === "string") {
+            return value;
+        }
+        return defaultValue;
+    }
+
     async setInt(key, value) {
         this._set(key, value);
     }

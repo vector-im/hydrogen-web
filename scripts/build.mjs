@@ -332,23 +332,32 @@ async function buildCssBundles(buildFn, themes, assets, mainCssFile = null) {
         mainCssFile = path.join(cssSrcDir, "main.css");
     }
     const bundleCss = await buildFn(mainCssFile);
+    const themesRelPath = 'themes';
+    const themesRoot = path.join(cssSrcDir, themesRelPath);
     await assets.write(`hydrogen.css`, bundleCss);
     for (const theme of themes) {
         const themeRelPath = `themes/${theme}/`;
         const themeRoot = path.join(cssSrcDir, themeRelPath);
         const assetUrlMapper = ({absolutePath}) => {
-            if (!absolutePath.startsWith(themeRoot)) {
-                throw new Error("resource is out of theme directory: " + absolutePath);
-            }
-            const relPath = absolutePath.substr(themeRoot.length);
+            const relPath = assetRelPath(absolutePath, themeRoot, themesRoot);
             const hashedDstPath = assets.resolve(path.join(themeRelPath, relPath));
             if (hashedDstPath) {
-                return hashedDstPath.substr(themeRelPath.length);
+                return assetRelPath(hashedDstPath, themeRelPath, themesRelPath);
             }
         };
         const themeCss = await buildFn(path.join(themeRoot, `theme.css`), assetUrlMapper);
         await assets.write(path.join(themeRelPath, `bundle.css`), themeCss);
     }
+}
+
+function assetRelPath(assetPath, themeRoot, themesRoot) {
+    if (assetPath.startsWith(themeRoot)) {
+        return assetPath.substr(themeRoot.length);
+    } else if (assetPath.startsWith(themesRoot)) {
+        // Themes are allowed to access assets in other themes
+        return path.join('..', assetPath.substr(themesRoot.length));
+    }
+    throw new Error("resource is out of themes root directory: " + assetPath);
 }
 
 // async function buildCss(entryPath, urlMapper = null) {

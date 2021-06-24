@@ -1,0 +1,104 @@
+/*
+Copyright 2021 The Matrix.org Foundation C.I.C.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+@import url('../element/theme.css');
+
+.hydrogen {
+    background-color: #15191E;
+    color: white;
+    scrollbar-color: rgba(255, 255, 255, .2) transparent;
+}
+
+.hydrogen ::-webkit-scrollbar {
+    background-color: transparent;
+    width: 6px;
+    height: 6px;
+}
+
+.hydrogen ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .2);
+    border-radius: 3px;
+}
+
+.LeftPanel {
+    background: #20252B;
+}
+
+.RoomHeader {
+    background-color: #15191E;
+}
+
+.FilterField {
+    background-color: #363C43;
+}
+
+.FilterField:focus-within {
+    background-color: #363C43;
+    border: 1px #A9B2BC solid;
+}
+
+.FilterField:focus-within button {
+    border-color: transparent;
+}
+
+.FilterField > input {
+    color: white;
+}
+
+.FilterField button {
+    background-color: transparent;
+}
+
+.button-utility {
+    background-color: #323840;
+}
+
+.MessageComposer {
+    border-top: none;
+}
+
+.MessageComposer > input {
+    background-color: #363C43;
+    color: white;
+    outline: none;
+    border: 1px solid transparent;
+}
+
+.MessageComposer:focus-within > input {
+    border: 1px #A9B2BC solid;
+}
+
+.MessageComposer > button.send:disabled {
+    display: none;
+}
+
+.middle-header {
+    background: #15191E;
+    border-bottom: none;
+}
+
+.AnnouncementView > div {
+    background-color: #20252B;
+    color: #A9B2BC;
+}
+
+.menu {
+    background-color: #20252B;
+}
+
+.menu button {
+    color: white;
+}

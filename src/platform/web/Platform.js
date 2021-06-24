@@ -36,6 +36,7 @@ import {BlobHandle} from "./dom/BlobHandle.js";
 import {hasReadPixelPermission, ImageHandle, VideoHandle} from "./dom/ImageHandle.js";
 import {downloadInIframe} from "./dom/download.js";
 import {Disposables} from "../../utils/Disposables.js";
+import {ThemeManager} from "./ThemeManager.js";
 
 function addScript(src) {
     return new Promise(function (resolve, reject) {
@@ -158,6 +159,7 @@ export class Platform {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) && !window.MSStream;
         this.isIOS = isIOS;
         this._disposables = new Disposables();
+        this.themeManager = new ThemeManager();
     }
 
     get updateService() {

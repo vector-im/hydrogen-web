@@ -158,5 +158,24 @@ export class SettingsViewModel extends ViewModel {
             this.emitChange("pushNotifications.serverError");
         }
     }
+
+    get themes() {
+        return this.platform.themeManager.themes;
+    }
+
+    get currentThemeName() {
+        return this.platform.themeManager.currentThemeName;
+    }
+
+    async setTheme(name) {
+        const vm = this;
+        return new Promise(resolve => {
+            vm.platform.themeManager.setTheme(name).then(() => {
+                vm.platform.settingsStorage.setString("theme", name);
+                vm.emitChange("currentThemeName");
+                resolve();
+            });
+        });
+    }
 }
 
