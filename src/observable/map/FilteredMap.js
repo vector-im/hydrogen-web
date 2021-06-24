@@ -91,8 +91,9 @@ export class FilteredMap extends BaseObservableMap {
             const isIncluded = this._filter(value, key);
             this._included.set(key, isIncluded);
             this._emitForUpdate(wasIncluded, isIncluded, key, value, params);
+        } else {
+            this.emitUpdate(key, value, params);
         }
-        this.emitUpdate(key, value, params);
     }
 
     _emitForUpdate(wasIncluded, isIncluded, key, value, params = null) {
@@ -191,5 +192,31 @@ export function tests() {
         // "filter changed values": assert => {
 
         // },
+
+        "emits must trigger once": assert => {
+            const source = new ObservableMap();
+            let count_add = 0, count_update = 0, count_remove = 0;
+            source.add("num1", 1);
+            source.add("num2", 2);
+            source.add("num3", 3);
+            const oddMap = new FilteredMap(source, x => x % 2 !== 0);
+            oddMap.subscribe({
+                onAdd() {
+                    count_add += 1;
+                },
+                onRemove() {
+                    count_remove += 1;
+                },
+                onUpdate() {
+                    count_update += 1;
+                }
+            });
+            source.set("num3", 4);
+            source.set("num3", 5);
+            source.set("num3", 7);
+            assert.strictEqual(count_add, 1);
+            assert.strictEqual(count_update, 1);
+            assert.strictEqual(count_remove, 1);
+        }
     }
 }
