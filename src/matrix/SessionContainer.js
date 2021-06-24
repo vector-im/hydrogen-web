@@ -97,7 +97,7 @@ export class SessionContainer {
         });
     }
 
-    async startWithLogin(homeServer, username, password) {
+    async startWithLogin(homeServer, username, password, guest = false) {
         if (this._status.get() !== LoadStatus.NotLoading) {
             return;
         }
@@ -109,7 +109,12 @@ export class SessionContainer {
             try {
                 const request = this._platform.request;
                 const hsApi = new HomeServerApi({homeServer, request});
-                const loginData = await hsApi.passwordLogin(username, password, "Hydrogen", {log}).response();
+                let loginData;
+                if (guest === true) {
+                    loginData = await hsApi.guestLogin("Hydrogen", {log}).response();
+                } else {
+                    loginData = await hsApi.passwordLogin(username, password, "Hydrogen", {log}).response();
+                }
                 const sessionId = this.createNewSessionId();
                 sessionInfo = {
                     id: sessionId,
