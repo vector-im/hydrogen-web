@@ -1,11 +1,17 @@
 import {PowerLevels} from "../../../matrix/room/timeline/PowerLevels.js";
 
 export function createMemberComparator(powerLevels) {
+    const collator = new Intl.Collator();
+    //TODO: This is so that all names with @ do not club together; but do we care?
+    const removeCharacter = string => string.charAt(0) === "@"? string.slice(1) : string;
+
     return function comparator(member, otherMember) {
         const p1 = powerLevels.getUserLevel(member.userId);
         const p2 = powerLevels.getUserLevel(otherMember.userId);
         if (p1 !== p2) { return p2 - p1; }
-        return member.name?.localeCompare(otherMember.name);
+        const name = removeCharacter(member.name);
+        const otherName = removeCharacter(otherMember.name);
+        return collator.compare(name, otherName);
     };
 }
 
