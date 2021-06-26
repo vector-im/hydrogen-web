@@ -9,6 +9,7 @@ export class MemberListViewModel extends ViewModel {
         this.memberTileViewModels = this._mapTileViewModels(this._filterJoinedMembers(options.members))
                                         .sortValues(createMemberComparator(options.powerLevels));
         this.nameDisambiguator = new Disambiguator();
+        this.mediaRepository = options.mediaRepository;
     }
 
     _filterJoinedMembers(members) {
@@ -17,7 +18,8 @@ export class MemberListViewModel extends ViewModel {
 
     _mapTileViewModels(members) {
         const mapper = (member, emitChange) => {
-            const vm = new MemberTileViewModel(this.childOptions({member, emitChange}));
+            const mediaRepository = this.mediaRepository;
+            const vm = new MemberTileViewModel(this.childOptions({member, emitChange, mediaRepository}));
             this.nameDisambiguator.disambiguate(vm);
             return vm;
         }

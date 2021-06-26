@@ -39,8 +39,9 @@ export class RightPanelViewModel extends ViewModel {
             const list = await this._room.loadMemberList();
             const members = list.members;
             const powerLevels = this._room.powerLevels;
+            const mediaRepository = this._room.mediaRepository;
             this._memberListViewModel = this.track(
-                new MemberListViewModel(this.childOptions({members, powerLevels}))
+                new MemberListViewModel(this.childOptions({members, powerLevels, mediaRepository}))
             );
         }
         this.emitChange("memberListViewModel");
