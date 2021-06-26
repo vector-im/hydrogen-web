@@ -38,3 +38,7 @@ ul.MemberListView {
     overflow: scroll;
     height: 100vh;
 }
+
+.MemberTileView {
+    display: flex;
+}

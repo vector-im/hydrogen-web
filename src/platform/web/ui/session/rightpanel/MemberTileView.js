@@ -3,6 +3,9 @@ import {AvatarView} from "../../avatar.js";
 
 export class MemberTileView extends TemplateView {
     render(t, vm) {
-        return t.div([t.view(new AvatarView(vm, 32)), vm => vm.name]);
+        return t.div({ className: "MemberTileView" }, [
+            t.view(new AvatarView(vm, 32)),
+            t.div({ className: "MemberTileView_name" }, (vm) => vm.name),
+        ]);
     }
 }
