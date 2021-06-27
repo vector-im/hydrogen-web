@@ -12,6 +12,8 @@ export class MemberListViewModel extends ViewModel {
         this.mediaRepository = options.mediaRepository;
     }
 
+    get type() { return "member-list"; }
+
     _filterJoinedMembers(members) {
         return members.filterValues(member => member.membership === "join");
     }

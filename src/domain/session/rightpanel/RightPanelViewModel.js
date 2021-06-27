@@ -11,6 +11,7 @@ export class RightPanelViewModel extends ViewModel {
 
     get roomDetailsViewModel() { return this._roomDetailsViewModel; }
     get memberListViewModel() { return this._memberListViewModel; }
+    get activeViewModel() { return this._roomDetailsViewModel ?? this._memberListViewModel; }
 
     _setupNavigation() {
         const details = this.navigation.observe("details");
