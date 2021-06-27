@@ -9,42 +9,38 @@ export class RightPanelViewModel extends ViewModel {
         this._setupNavigation();
     }
 
-    get roomDetailsViewModel() { return this._roomDetailsViewModel; }
-    get memberListViewModel() { return this._memberListViewModel; }
-    get activeViewModel() { return this._roomDetailsViewModel ?? this._memberListViewModel; }
+    get activeViewModel() { return this._activeViewModel; }
+
+    async _memberArguments() {
+        const list = await this._room.loadMemberList();
+        const room = this._room;
+        return {members: list.members, powerLevels: room.powerLevels, mediaRepository: room.mediaRepository};
+    }
 
     _setupNavigation() {
-        const details = this.navigation.observe("details");
-        this.track(details.subscribe(() => this._toggleRoomDetailsPanel()));
-        this._toggleRoomDetailsPanel();
-
-        const members = this.navigation.observe("members");
-        this.track(members.subscribe(() => this._toggleMemberListPanel()));
-        this._toggleMemberListPanel();
+        this._hookSegmentToToggler("details", RoomDetailsViewModel, () => { return {room: this._room}; });
+        this._hookSegmentToToggler("members", MemberListViewModel, () => this._memberArguments());
     }
 
-    _toggleRoomDetailsPanel() {
-        this._roomDetailsViewModel = this.disposeTracked(this._roomDetailsViewModel);
-        const enable = !!this.navigation.path.get("details")?.value;
-        if (enable) {
-            const room = this._room;
-            this._roomDetailsViewModel = this.track(new RoomDetailsViewModel(this.childOptions({room})));
-        }
-        this.emitChange("roomDetailsViewModel");
+    _hookSegmentToToggler(segment, viewmodel, argCreator) {
+        const observable = this.navigation.observe(segment);
+        const toggler = this._setupToggler(segment, viewmodel, argCreator);
+        this.track(observable.subscribe(() => toggler()));
     }
 
-    async _toggleMemberListPanel() {
-        this._memberListViewModel = this.disposeTracked(this._memberListViewModel);
-        const enable = !!this.navigation.path.get("members")?.value;
-        if (enable) {
-            const list = await this._room.loadMemberList();
-            const members = list.members;
-            const powerLevels = this._room.powerLevels;
-            const mediaRepository = this._room.mediaRepository;
-            this._memberListViewModel = this.track(
-                new MemberListViewModel(this.childOptions({members, powerLevels, mediaRepository}))
-            );
-        }
-        this.emitChange("memberListViewModel");
+    _setupToggler(segment, viewmodel, argCreator) {
+        const toggler = async (skipDispose = false) => {
+            if (!skipDispose) {
+                this._activeViewModel = this.disposeTracked(this._activeViewModel);
+            }
+            const enable = !!this.navigation.path.get(segment)?.value;
+            if (enable) {
+                const args = await argCreator();
+                this._activeViewModel = this.track(new viewmodel(this.childOptions(args)));
+            }
+            this.emitChange("activeViewModel");
+        };
+        toggler(true);
+        return toggler;
     }
 }
