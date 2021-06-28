@@ -17,7 +17,7 @@ export class Disambiguator {
         }
     }
 
-    async _handlePreviousName(vm) {
+    _handlePreviousName(vm) {
         const previousName = vm.previousName;
         if (!previousName) { return; }
         const value = this._map.get(previousName);
@@ -29,7 +29,7 @@ export class Disambiguator {
         }
     }
 
-    async _updateMap(vm) {
+    _updateMap(vm) {
         const name = vm.name;
         if (this._map.has(name)) {
             const value = this._map.get(name);
@@ -43,10 +43,10 @@ export class Disambiguator {
         }
     }
 
-    async disambiguate(vm) {
+    disambiguate(vm) {
         if (!vm.nameChanged) { return; }
-        await this._handlePreviousName(vm);
-        await this._updateMap(vm);
+        this._handlePreviousName(vm);
+        this._updateMap(vm);
         const value = this._map.get(vm.name);
         if (Array.isArray(value)) {
             value.forEach((vm) => vm.setDisambiguation(true));
@@ -87,60 +87,60 @@ export function tests(){
     }
 
     return {
-        "Unique names": async assert => {
+        "Unique names": assert => {
             const [vm1, vm2, d] = createVmAndDisambiguator([["foo", "a"], ["bar", "b"]]);
-            await d.disambiguate(vm1);
-            await d.disambiguate(vm2);
+            d.disambiguate(vm1);
+            d.disambiguate(vm2);
             assert.strictEqual(vm1.disambiguate, false);
             assert.strictEqual(vm2.disambiguate, false);
         },
 
-        "Same names are disambiguated": async assert => {
+        "Same names are disambiguated": assert => {
             const [vm1, vm2, vm3, d] = createVmAndDisambiguator([["foo", "a"], ["foo", "b"], ["foo", "c"]]);
-            await d.disambiguate(vm1);
-            await d.disambiguate(vm2);
-            await d.disambiguate(vm3);
+            d.disambiguate(vm1);
+            d.disambiguate(vm2);
+            d.disambiguate(vm3);
             assert.strictEqual(vm1.disambiguate, true);
             assert.strictEqual(vm2.disambiguate, true);
             assert.strictEqual(vm3.disambiguate, true);
         },
 
-        "Name updates disambiguate": async assert => {
+        "Name updates disambiguate": assert => {
             const [vm1, vm2, vm3, d] = createVmAndDisambiguator([["foo", "a"], ["bar", "b"], ["jar", "c"]]);
-            await d.disambiguate(vm1);
-            await d.disambiguate(vm2);
-            await d.disambiguate(vm3);
+            d.disambiguate(vm1);
+            d.disambiguate(vm2);
+            d.disambiguate(vm3);
             
             vm2.updateName("foo");
-            await d.disambiguate(vm2);
+            d.disambiguate(vm2);
             assert.strictEqual(vm1.disambiguate, true);
             assert.strictEqual(vm2.disambiguate, true);
 
             vm1.updateName("bar");
-            await d.disambiguate(vm1);
+            d.disambiguate(vm1);
             assert.strictEqual(vm1.disambiguate, false);
             assert.strictEqual(vm2.disambiguate, false);
 
             vm3.updateName("foo");
-            await d.disambiguate(vm3);
+            d.disambiguate(vm3);
             vm1.updateName("foo");
-            await d.disambiguate(vm1);
+            d.disambiguate(vm1);
             assert.strictEqual(vm1.disambiguate, true);
             assert.strictEqual(vm2.disambiguate, true);
             assert.strictEqual(vm3.disambiguate, true);
 
             vm2.updateName("bar");
-            await d.disambiguate(vm2);
+            d.disambiguate(vm2);
             assert.strictEqual(vm1.disambiguate, true);
             assert.strictEqual(vm2.disambiguate, false);
             assert.strictEqual(vm3.disambiguate, true);
         },
 
-        "Multiple disambiguate events": async assert => {
+        "Multiple disambiguate events": assert => {
             const [vm1, d] = createVmAndDisambiguator([["foo", "a"]]);
-            await d.disambiguate(vm1);
+            d.disambiguate(vm1);
             vm1.updateName(vm1.name);
-            await d.disambiguate(vm1);
+            d.disambiguate(vm1);
             assert.strictEqual(vm1.disambiguate, false);
         },
     };
