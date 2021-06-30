@@ -11,25 +11,25 @@ export class RightPanelViewModel extends ViewModel {
 
     get activeViewModel() { return this._activeViewModel; }
 
-    async _memberArguments() {
+    async _getMemberArguments() {
         const list = await this._room.loadMemberList();
         const room = this._room;
         return {members: list.members, powerLevels: room.powerLevels, mediaRepository: room.mediaRepository};
     }
 
     _setupNavigation() {
-        this._hookSegmentToToggler("details", RoomDetailsViewModel, () => { return {room: this._room}; });
-        this._hookSegmentToToggler("members", MemberListViewModel, () => this._memberArguments());
+        this._hookUpdaterToSegment("details", RoomDetailsViewModel, () => { return {room: this._room}; });
+        this._hookUpdaterToSegment("members", MemberListViewModel, () => this._getMemberArguments());
     }
 
-    _hookSegmentToToggler(segment, viewmodel, argCreator) {
+    _hookUpdaterToSegment(segment, viewmodel, argCreator) {
         const observable = this.navigation.observe(segment);
-        const toggler = this._setupToggler(segment, viewmodel, argCreator);
-        this.track(observable.subscribe(() => toggler()));
+        const updater = this._setupUpdater(segment, viewmodel, argCreator);
+        this.track(observable.subscribe(() => updater()));
     }
 
-    _setupToggler(segment, viewmodel, argCreator) {
-        const toggler = async (skipDispose = false) => {
+    _setupUpdater(segment, viewmodel, argCreator) {
+        const updater = async (skipDispose = false) => {
             if (!skipDispose) {
                 this._activeViewModel = this.disposeTracked(this._activeViewModel);
             }
@@ -40,7 +40,7 @@ export class RightPanelViewModel extends ViewModel {
             }
             this.emitChange("activeViewModel");
         };
-        toggler(true);
-        return toggler;
+        updater(true);
+        return updater;
     }
 }
