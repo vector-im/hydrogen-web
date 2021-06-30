@@ -87,6 +87,11 @@ function roomsSegmentWithRoom(rooms, roomId, path) {
     }
 }
 
+function pushRightPanelSegment(array, segment) {
+    array.push(new Segment("right-panel"));
+    array.push(new Segment(segment));
+}
+
 export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
     // substr(1) to take of initial /
     const parts = urlPath.substr(1).split("/");
@@ -116,8 +121,7 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
             }
             segments.push(new Segment("room", roomId));
             if (currentNavPath.get("details")?.value) {
-                segments.push(new Segment("right-panel"));
-                segments.push(new Segment("details"));
+                pushRightPanelSegment(segments, "details");
             }
         } else if (type === "last-session") {
             let sessionSegment = currentNavPath.get("session");
@@ -127,13 +131,8 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
             if (sessionSegment) {
                 segments.push(sessionSegment);
             }
-        } else if (type === "details") {
-            segments.push(new Segment("right-panel"));
-            segments.push(new Segment("details"));
-        } else if (type === "members") {
-            //TODO: Fix duplication here.
-            segments.push(new Segment("right-panel"));
-            segments.push(new Segment("members"));
+        } else if (type === "details" || type === "members") {
+            pushRightPanelSegment(segments, type);
         } else {
             // might be undefined, which will be turned into true by Segment 
             const value = iterator.next().value;
