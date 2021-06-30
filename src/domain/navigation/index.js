@@ -162,6 +162,7 @@ export function stringifyPath(path) {
                 }
                 break;
             case "right-panel":
+                // Ignore right-panel in url
                 continue;
             default:
                 urlPath += `/${segment.type}`;
