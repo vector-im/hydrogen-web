@@ -96,7 +96,7 @@ export class LeftPanelViewModel extends ViewModel {
         let _path = path;
         const details = this.navigation.path.get("details");
         if (details?.value) {
-            _path = _path.with(this.navigation.segment("rightpanel"));
+            _path = _path.with(this.navigation.segment("right-panel"));
             _path = _path.with(details)
         }
         return _path;

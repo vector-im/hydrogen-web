@@ -82,7 +82,7 @@ export class SessionViewModel extends ViewModel {
         this._updateLightbox(lightbox.get());
 
 
-        const rightpanel = this.navigation.observe("rightpanel");
+        const rightpanel = this.navigation.observe("right-panel");
         this.track(rightpanel.subscribe(() => this._updateRightPanel()));
         this._updateRightPanel();
     }
@@ -260,7 +260,7 @@ export class SessionViewModel extends ViewModel {
 
     _updateRightPanel() {
         this._rightPanelViewModel = this.disposeTracked(this._rightPanelViewModel);
-        const enable = !!this.navigation.path.get("rightpanel")?.value;
+        const enable = !!this.navigation.path.get("right-panel")?.value;
         if (enable) {
             const room = this._roomFromNavigation();
             this._rightPanelViewModel = this.track(new RightPanelViewModel(this.childOptions({room})));

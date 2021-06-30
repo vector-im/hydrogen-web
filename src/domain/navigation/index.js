@@ -37,8 +37,8 @@ function allowsChild(parent, child) {
             // downside of the approach: both of these will control which tile is selected
             return type === "room" || type === "empty-grid-tile";
         case "room":
-            return type === "lightbox" || type === "rightpanel";
-        case "rightpanel":
+            return type === "lightbox" || type === "right-panel";
+        case "right-panel":
             return type === "details"|| type === "members";
         default:
             return false;
@@ -116,7 +116,7 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
             }
             segments.push(new Segment("room", roomId));
             if (currentNavPath.get("details")?.value) {
-                segments.push(new Segment("rightpanel"));
+                segments.push(new Segment("right-panel"));
                 segments.push(new Segment("details"));
             }
         } else if (type === "last-session") {
@@ -128,11 +128,11 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
                 segments.push(sessionSegment);
             }
         } else if (type === "details") {
-            segments.push(new Segment("rightpanel"));
+            segments.push(new Segment("right-panel"));
             segments.push(new Segment("details"));
         } else if (type === "members") {
             //TODO: Fix duplication here.
-            segments.push(new Segment("rightpanel"));
+            segments.push(new Segment("right-panel"));
             segments.push(new Segment("members"));
         } else {
             // might be undefined, which will be turned into true by Segment 
@@ -162,7 +162,7 @@ export function stringifyPath(path) {
                     urlPath += `/${segment.type}/${segment.value}`;
                 }
                 break;
-            case "rightpanel":
+            case "right-panel":
                 continue;
             default:
                 urlPath += `/${segment.type}`;
@@ -197,13 +197,13 @@ export function tests() {
             const urlPath = stringifyPath(path);
             assert.equal(urlPath, "/session/1/rooms/a,b,c/1");
         },
-        "stringify url with rightpanel and details segment": assert => {
+        "stringify url with right-panel and details segment": assert => {
             const nav = new Navigation(allowsChild);
             const path = nav.pathFrom([
                 new Segment("session", 1),
                 new Segment("rooms", ["a", "b", "c"]),
                 new Segment("room", "b"),
-                new Segment("rightpanel"),
+                new Segment("right-panel"),
                 new Segment("details")
             ]);
             const urlPath = stringifyPath(path);
@@ -287,7 +287,7 @@ export function tests() {
                 new Segment("session", 1),
                 new Segment("rooms", ["a", "b", "c"]),
                 new Segment("room", "b"),
-                new Segment("rightpanel", true),
+                new Segment("right-panel", true),
                 new Segment("details", true)
             ]);
             const segments = parseUrlPath("/session/1/open-room/a", path);
@@ -298,7 +298,7 @@ export function tests() {
             assert.deepEqual(segments[1].value, ["a", "b", "c"]);
             assert.equal(segments[2].type, "room");
             assert.equal(segments[2].value, "a");
-            assert.equal(segments[3].type, "rightpanel");
+            assert.equal(segments[3].type, "right-panel");
             assert.equal(segments[3].value, true);
             assert.equal(segments[4].type, "details");
             assert.equal(segments[4].value, true);
