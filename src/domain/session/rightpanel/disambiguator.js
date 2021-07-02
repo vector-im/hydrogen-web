@@ -3,12 +3,6 @@ export class Disambiguator {
         this._map = new Map();
     }
 
-    _flatten(name, array) {
-        const vm = array.pop();
-        vm.setDisambiguation(false);
-        this._map.set(name, vm);
-    }
-
     _unDisambiguate(vm, array) {
         const idx = array.indexOf(vm);
         if (idx !== -1) {
@@ -23,7 +17,11 @@ export class Disambiguator {
         const value = this._map.get(previousName);
         if (Array.isArray(value)) {
             this._unDisambiguate(vm, value);
-            if (value.length === 1) { this._flatten(previousName, value); }
+            if (value.length === 1) {
+                const vm = value[0];
+                vm.setDisambiguation(false);
+                this._map.set(previousName, vm);
+            }
         } else {
             this._map.delete(previousName);
         }
