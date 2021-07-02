@@ -143,5 +143,15 @@ export function tests(){
             d.disambiguate(vm1);
             assert.strictEqual(vm1.disambiguate, false);
         },
+
+        "Empty names must un-disambiguate": assert => {
+            const [vm1, vm2, d] = createVmAndDisambiguator([["", "a"], ["", "b"]]);
+            d.disambiguate(vm1);
+            d.disambiguate(vm2);
+            vm1.updateName("foo");
+            d.disambiguate(vm1);
+            assert.strictEqual(vm1.disambiguate, false);
+            assert.strictEqual(vm2.disambiguate, false);
+        }
     };
 }
