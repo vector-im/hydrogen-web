@@ -19,7 +19,7 @@ export class Disambiguator {
 
     _handlePreviousName(vm) {
         const previousName = vm.previousName;
-        if (!previousName) { return; }
+        if (typeof previousName !== "string") { return; }
         const value = this._map.get(previousName);
         if (Array.isArray(value)) {
             this._unDisambiguate(vm, value);
