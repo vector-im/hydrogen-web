@@ -31,8 +31,8 @@ export class Disambiguator {
 
     _updateMap(vm) {
         const name = vm.name;
-        if (this._map.has(name)) {
-            const value = this._map.get(name);
+        const value = this._map.get(name);
+        if (value) {
             if (Array.isArray(value)) {
                 value.push(vm);
             } else {
