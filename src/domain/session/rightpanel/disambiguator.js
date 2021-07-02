@@ -35,8 +35,11 @@ export class Disambiguator {
         if (value) {
             if (Array.isArray(value)) {
                 value.push(vm);
+                return value;
             } else {
-                this._map.set(name, [value, vm]);
+                const array = [value, vm]
+                this._map.set(name, array);
+                return array;
             }
         } else {
             this._map.set(name, vm);
@@ -46,11 +49,8 @@ export class Disambiguator {
     disambiguate(vm) {
         if (!vm.nameChanged) { return; }
         this._handlePreviousName(vm);
-        this._updateMap(vm);
-        const value = this._map.get(vm.name);
-        if (Array.isArray(value)) {
-            value.forEach((vm) => vm.setDisambiguation(true));
-        }
+        const value = this._updateMap(vm);
+        value?.forEach((vm) => vm.setDisambiguation(true));
     }
 }
 
