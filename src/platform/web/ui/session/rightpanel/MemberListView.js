@@ -1,9 +1,14 @@
 import {TemplateView} from "../../general/TemplateView.js";
-import {ListView} from "../../general/ListView.js";
+import {LazyListView} from "../../general/LazyListView.js";
 import {MemberTileView} from "./MemberTileView.js";
 
 export class MemberListView extends TemplateView {
     render(t, vm) {
-        return t.view(new ListView({list: vm.memberTileViewModels, className:"MemberListView"}, tileViewModel => new MemberTileView(tileViewModel)));
+        return t.view(new LazyListView({
+            list: vm.memberTileViewModels,
+            className: "MemberListView",
+            height: 691,
+            itemHeight: 32
+        }, tileViewModel => new MemberTileView(tileViewModel)));
     }
 }
