@@ -17,7 +17,7 @@ limitations under the License.
 import {el} from "./html.js";
 import {mountView} from "./utils.js";
 
-function insertAt(parentNode, idx, childNode) {
+export function insertAt(parentNode, idx, childNode) {
     const isLast = idx === parentNode.childElementCount;
     if (isLast) {
         parentNode.appendChild(childNode);
