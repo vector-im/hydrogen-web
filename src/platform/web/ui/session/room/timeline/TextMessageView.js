@@ -36,18 +36,29 @@ export class TextMessageView extends BaseMessageView {
  * Map from part to function that outputs DOM for the part
  */
 const formatFunction = {
+    header: headerBlock => tag["h" + Math.min(6,headerBlock.level)]({}, renderParts(headerBlock.inlines)),
+    codeblock: codeBlock => tag.pre({}, tag.code({}, text(codeBlock.text))),
+    emph: emphPart => tag.em({}, renderParts(emphPart.inlines)),
+    code: codePart => tag.code({}, text(codePart.text)),
     text: textPart => text(textPart.text),
-    link: linkPart => tag.a({ href: linkPart.url, target: "_blank", rel: "noopener" }, [linkPart.text]),
+    link: linkPart => tag.a({ href: linkPart.url, target: "_blank", rel: "noopener" }, renderParts(linkPart.inlines)),
     newline: () => tag.br()
 };
+
+function renderPart(part) {
+    const f = formatFunction[part.type];
+    return f(part);
+}
+
+function renderParts(parts) {
+    return Array.from(parts, renderPart);
+}
 
 class BodyView extends StaticView {
     render(t, messageBody) {
         const container = t.span();
         for (const part of messageBody.parts) {
-            const f = formatFunction[part.type];
-            const element = f(part);
-            container.appendChild(element);
+            container.appendChild(renderPart(part));
         }
         return container;
     }

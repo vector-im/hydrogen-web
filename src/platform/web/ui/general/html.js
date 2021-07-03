@@ -94,7 +94,7 @@ export const TAG_NAMES = {
     [HTML_NS]: [
         "br", "a", "ol", "ul", "li", "div", "h1", "h2", "h3", "h4", "h5", "h6",
         "p", "strong", "em", "span", "img", "section", "main", "article", "aside",
-        "pre", "button", "time", "input", "textarea", "label", "form", "progress", "output", "video"],
+        "pre", "code", "button", "time", "input", "textarea", "label", "form", "progress", "output", "video"],
     [SVG_NS]: ["svg", "circle"]
 };
 
