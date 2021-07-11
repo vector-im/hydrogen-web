@@ -1,5 +1,12 @@
 .RightPanelView{
     grid-area: right;
+    min-height: 0;
+}
+
+.LazyListParent {
+    overflow:scroll;
+    overflow-x:hidden;
+    height: 100vh;
 }
 
 .RoomDetailsView {
@@ -32,11 +39,6 @@
     display: flex;
     justify-content: flex-end;
     width: 100%;
-}
-
-ul.MemberListView {
-    overflow: scroll;
-    height: 100vh;
 }
 
 .MemberTileView {
