@@ -130,11 +130,16 @@ export class LazyListView extends ListView {
         return this._parent;
     }
 
+    update(attributes) {
+        this._renderRange = null;
+        super.update(attributes);
+        this._renderIfNeeded();
+    }
+
     loadList() {
         if (!this._list) { return; }
         this._subscription = this._list.subscribe(this);
         this._childInstances = [];
-        // todo: this breaks update in parent
     }
 
 
