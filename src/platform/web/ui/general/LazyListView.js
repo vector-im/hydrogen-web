@@ -44,6 +44,10 @@ class ItemRange {
     }
 
     normalize(idx) {
+        /*
+        Since we don't render the entire list, the index we use to do dom 
+        manipulation or access childInstances will be different.
+        */
         return idx - this.topCount;
     }
 }
@@ -73,14 +77,15 @@ export class LazyListView extends ListView {
         const intersectRange = range.expand(this._overflowMargin);
         const renderRange = range.expand(this._overflowItems);
         const listHasChangedSize = !!this._renderRange && this._list.length !== this._renderRange.totalSize();
-        console.log("currentRange", range);
-        console.log("renderRange", renderRange);
-        console.log("intersectRange", intersectRange);
-        console.log("LastRenderedRange", this._renderRange);
+        // console.log("currentRange", range);
+        // console.log("renderRange", renderRange);
+        // console.log("intersectRange", intersectRange);
+        // console.log("LastRenderedRange", this._renderRange);
         // only update render Range if the list has shrunk/grown and we need to adjust padding OR
         // if the new range + overflowMargin isn't contained by the old anymore
         if (listHasChangedSize || !this._renderRange || !this._renderRange.contains(intersectRange)) {
             console.log("New render change");
+            console.log("scrollTop", this._parent.scrollTop);
             this._renderRange = renderRange;
             this._renderElementsInRange();
         }
