@@ -123,7 +123,6 @@ export class LazyListView extends ListView {
         this._parent = el("div", {className: "LazyListParent"}, root);
         /*
         Hooking to scroll events can be expensive.
-        But in most of these scroll events, we return early.
         Do we need to do more (like event throttling)?
         */
         this._parent.addEventListener("scroll", () => this._renderIfNeeded());
