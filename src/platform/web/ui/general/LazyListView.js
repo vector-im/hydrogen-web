@@ -55,12 +55,11 @@ class ItemRange {
 }
 
 export class LazyListView extends ListView {
-    constructor({itemHeight, height, ...options}, childCreator) {
+    constructor({itemHeight, overflowMargin = 5, overflowItems = 20,...options}, childCreator) {
         super(options, childCreator);
         this._itemHeight = itemHeight;
-        this._height = height;
-        this._overflowMargin = 5;
-        this._overflowItems = 20;
+        this._overflowMargin = overflowMargin;
+        this._overflowItems = overflowItems;
     }
 
     _getVisibleRange() {
@@ -83,14 +82,30 @@ export class LazyListView extends ListView {
         // console.log("renderRange", renderRange);
         // console.log("intersectRange", intersectRange);
         // console.log("LastRenderedRange", this._renderRange);
-        // only update render Range if the list has shrunk/grown and we need to adjust padding OR
-        // if the new range + overflowMargin isn't contained by the old anymore
-        if (listHasChangedSize || !this._renderRange || !this._renderRange.contains(intersectRange)) {
-            console.log("New render change");
-            console.log("scrollTop", this._parent.scrollTop);
+        // only update render Range if the new range + overflowMargin isn't contained by the old anymore
+        if (listHasChangedSize || !this._renderRange.contains(intersectRange)) {
+            // console.log("New render change");
+            // console.log("scrollTop", this._parent.scrollTop);
             this._renderRange = renderRange;
             this._renderElementsInRange();
         }
+    }
+
+    async _initialRender() {
+        /*
+        Wait two frames for the return from mount() to be inserted into DOM.
+        This should be enough, but if this gives us trouble we can always use
+        MutationObserver.
+        */
+        await new Promise(r => requestAnimationFrame(r));
+        await new Promise(r => requestAnimationFrame(r));
+
+        this._height = this._parent.clientHeight;
+        if(this._height === 0) { throw "LazyListView could not calculate parent height."}
+        const range = this._getVisibleRange();
+        const renderRange = range.expand(this._overflowItems);
+        this._renderRange = renderRange;
+        this._renderElementsInRange();
     }
 
     _renderItems(items) {
@@ -126,14 +141,14 @@ export class LazyListView extends ListView {
         Do we need to do more (like event throttling)?
         */
         this._parent.addEventListener("scroll", () => this._renderIfNeeded());
-        this._renderIfNeeded();
+        this._initialRender();
         return this._parent;
     }
 
     update(attributes) {
         this._renderRange = null;
         super.update(attributes);
-        this._renderIfNeeded();
+        this._initialRender();
     }
 
     loadList() {
