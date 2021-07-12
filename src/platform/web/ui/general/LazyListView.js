@@ -140,6 +140,10 @@ export class LazyListView extends ListView {
         if (!this._list) { return; }
         this._subscription = this._list.subscribe(this);
         this._childInstances = [];
+        /*
+        super.loadList() would render the entire list at this point.
+        We instead lazy render a part of the list in _renderIfNeeded
+        */
     }
 
 
@@ -161,7 +165,8 @@ export class LazyListView extends ListView {
     
     recreateItem(idx, value) {
         if (this._renderRange.containsIndex(idx)) {
-            super.recreateItem(idx, value)
+            const normalizedIdx = this._renderRange.normalize(idx);
+            super.recreateItem(normalizedIdx, value)
         }
     }
 
