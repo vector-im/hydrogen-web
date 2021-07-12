@@ -45,8 +45,10 @@ class ItemRange {
 
     normalize(idx) {
         /*
-        Since we don't render the entire list, the index we use to do dom 
-        manipulation or access childInstances will be different.
+        map index from list to index in rendered range
+        eg: if the index range of this._list is [0, 200] and we have rendered
+        elements in range [50, 60] then index 50 in list must map to index 0
+        in DOM tree/childInstance array.
         */
         return idx - this.topCount;
     }
