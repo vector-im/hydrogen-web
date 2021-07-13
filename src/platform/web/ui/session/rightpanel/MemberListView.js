@@ -7,7 +7,7 @@ export class MemberListView extends TemplateView {
         return t.view(new LazyListView({
             list: vm.memberTileViewModels,
             className: "MemberListView",
-            itemHeight: 32
+            itemHeight: 40
         }, tileViewModel => new MemberTileView(tileViewModel)));
     }
 }
