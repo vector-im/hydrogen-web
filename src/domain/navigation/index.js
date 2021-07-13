@@ -92,6 +92,16 @@ function pushRightPanelSegment(array, segment) {
     array.push(new Segment(segment));
 }
 
+export function addPanelIfNeeded(navigation, panel, path) {
+    const segment = navigation.path.get(panel);
+    let _path = path;
+    if (segment?.value) {
+        _path = _path.with(navigation.segment("right-panel"));
+        _path = _path.with(segment)
+    }
+    return _path;
+}
+
 export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
     // substr(1) to take of initial /
     const parts = urlPath.substr(1).split("/");
@@ -122,6 +132,8 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
             segments.push(new Segment("room", roomId));
             if (currentNavPath.get("details")?.value) {
                 pushRightPanelSegment(segments, "details");
+            } else if (currentNavPath.get("members")?.value) {
+                pushRightPanelSegment(segments, "members");
             }
         } else if (type === "last-session") {
             let sessionSegment = currentNavPath.get("session");

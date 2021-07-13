@@ -20,6 +20,7 @@ import {RoomTileViewModel} from "./RoomTileViewModel.js";
 import {InviteTileViewModel} from "./InviteTileViewModel.js";
 import {RoomFilter} from "./RoomFilter.js";
 import {ApplyMap} from "../../../observable/map/ApplyMap.js";
+import {addPanelIfNeeded} from "../../navigation/index.js";
 
 export class LeftPanelViewModel extends ViewModel {
     constructor(options) {
@@ -92,13 +93,10 @@ export class LeftPanelViewModel extends ViewModel {
         }
     }
 
-    _pathForDetails(path) {
+    _pathForRightPanel(path) {
         let _path = path;
-        const details = this.navigation.path.get("details");
-        if (details?.value) {
-            _path = _path.with(this.navigation.segment("right-panel"));
-            _path = _path.with(details)
-        }
+        _path = addPanelIfNeeded(this.navigation, "details", _path);
+        _path = addPanelIfNeeded(this.navigation, "members", _path);
         return _path;
     }
 
@@ -108,13 +106,13 @@ export class LeftPanelViewModel extends ViewModel {
         if (this.gridEnabled) {
             if (room) {
                 path = path.with(room);
-                path = this._pathForDetails(path);
+                path = this._pathForRightPanel(path);
             }
         } else {
             if (room) {
                 path = path.with(this.navigation.segment("rooms", [room.value]));
                 path = path.with(room);
-                path = this._pathForDetails(path);
+                path = this._pathForRightPanel(path);
             } else {
                 path = path.with(this.navigation.segment("rooms", []));
                 path = path.with(this.navigation.segment("empty-grid-tile", 0));
