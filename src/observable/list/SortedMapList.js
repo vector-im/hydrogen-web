@@ -119,10 +119,6 @@ export class SortedMapList extends BaseObservableList {
         return this._sourceMap.size;
     }
 
-    slice(start, end) {
-        return this._sortedPairs.slice(start, end);
-    }
-
     [Symbol.iterator]() {
         const it = this._sortedPairs.values();
         return {
