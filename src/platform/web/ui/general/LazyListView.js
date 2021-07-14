@@ -130,15 +130,18 @@ export class LazyListView extends ListView {
         }
         return array;
     }
+
     _renderElementsInRange() {
         const { topCount, renderCount, bottomCount } = this._renderRange;
         const paddingTop = topCount * this._itemHeight;
         const paddingBottom = bottomCount * this._itemHeight;
         const renderedItems = this._itemsFromList(topCount, topCount + renderCount);
-        console.log(renderedItems);
         this._root.style.paddingTop = `${paddingTop}px`;
         this._root.style.paddingBottom = `${paddingBottom}px`;
-        this._root.innerHTML = "";
+        for (const child of this._childInstances) {
+            child.root().remove();
+            child.unmount();
+        }
         this._renderItems(renderedItems);
     }
 
