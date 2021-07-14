@@ -28,6 +28,9 @@ import {EventEntry} from "./timeline/entries/EventEntry.js";
 import {ObservedEventMap} from "./ObservedEventMap.js";
 import {DecryptionSource} from "../e2ee/common.js";
 import {ensureLogItem} from "../../logging/utils.js";
+import {TimelineReader} from "./timeline/persistence/TimelineReader.js";
+import {PowerLevels} from "./timeline/PowerLevels.js";
+import {RetainedObservableValue} from "../../observable/ObservableValue.js";
 
 const EVENT_ENCRYPTED_TYPE = "m.room.encrypted";
 
@@ -378,8 +381,44 @@ export class BaseRoom extends EventEmitter {
         return this._summary.data.membership;
     }
 
-    get powerLevels() {
-        return this._timeline.powerLevels;
+    async loadPowerLevels() {
+        const timelineReader = new TimelineReader({
+            roomId: this._roomId,
+            storage: this._storage,
+            fragmentIdComparer: this._fragmentIdComparer
+        });
+        const txn = await this._storage.readTxn(
+            timelineReader.readTxnStores.concat(this._storage.storeNames.roomMembers, this._storage.storeNames.roomState)
+        );
+        const powerLevelsState = await txn.roomState.get(this._roomId, "m.room.power_levels", "");
+        if (powerLevelsState) {
+            return new PowerLevels({
+                powerLevelEvent: powerLevelsState.event,
+                ownUserId: this._user.id,
+                membership: this.membership
+            });
+        }
+        const createState = await txn.roomState.get(this._roomId, "m.room.create", "");
+        if (createState) {
+            return new PowerLevels({
+                createEvent: createState.event,
+                ownUserId: this._user.id,
+                membership: this.membership
+            });
+        } else {
+            const membership = this.membership;
+            return new PowerLevels({ownUserId: this._user.id, membership});
+        }
+    }
+
+    async observePowerLevels() {
+        let observable = this._powerLevels;
+        if (!observable) {
+            const powerLevels = await this.loadPowerLevels();
+            observable = new RetainedObservableValue(powerLevels, () => { this._powerLevels = null; });
+            this._powerLevels = observable;
+        }
+        return observable;
     }
 
     enableSessionBackup(sessionBackup) {
@@ -423,6 +462,7 @@ export class BaseRoom extends EventEmitter {
                 },
                 clock: this._platform.clock,
                 logger: this._platform.logger,
+                powerLevelsObservable: await this.observePowerLevels()
             });
             try {
                 if (this._roomEncryption) {
