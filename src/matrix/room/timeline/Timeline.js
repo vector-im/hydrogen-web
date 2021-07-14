@@ -43,8 +43,14 @@ export class Timeline {
         });
         this._readerRequest = null;
         this._allEntries = null;
-        this._powerLevels = powerLevelsObservable.get();
-        this._disposables.track(powerLevelsObservable.subscribe(powerLevels => this._powerLevels = powerLevels));
+        this.initializePowerLevels(powerLevelsObservable);
+    }
+
+    initializePowerLevels(observable) {
+        if (observable) {
+            this._powerLevels = observable.get();
+            this._disposables.track(observable.subscribe(powerLevels => this._powerLevels = powerLevels));
+        }
     }
 
     /** @package */
