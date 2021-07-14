@@ -28,7 +28,7 @@ export class MemberList extends RetainedValue {
 
     afterSync(memberChanges) {
         for (const [userId, memberChange] of memberChanges.entries()) {
-            this._members.add(userId, memberChange.member);
+            this._members.set(userId, memberChange.member);
         }
     }
 

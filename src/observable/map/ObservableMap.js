@@ -54,6 +54,17 @@ export class ObservableMap extends BaseObservableMap {
         }
     }
 
+    set(key, value) {
+        if (this._values.has(key)) {
+            // We set the value here because update only supports inline updates
+            this._values.set(key, value);
+            return this.update(key);
+        }    
+        else {
+            return this.add(key, value);
+        }
+    }
+
     reset() {
         this._values.clear();
         this.emitReset();
@@ -134,6 +145,31 @@ export function tests() {
             const result = map.update(1);
             assert.equal(fired, 0);
             assert.equal(result, false);
+        },
+
+        test_set(assert) {
+            let add_fired = 0, update_fired = 0;
+            const map = new ObservableMap();
+            map.subscribe({
+                onAdd(key, value) {
+                    add_fired += 1;
+                    assert.equal(key, 1);
+                    assert.deepEqual(value, {value: 5}); 
+                },
+                onUpdate(key, value, params) {
+                    update_fired += 1;
+                    assert.equal(key, 1);
+                    assert.deepEqual(value, {value: 7}); 
+                }
+            });
+            // Add
+            map.set(1, {value: 5});
+            assert.equal(map.size, 1);
+            assert.equal(add_fired, 1);
+            // Update
+            map.set(1, {value: 7});
+            assert.equal(map.size, 1);
+            assert.equal(update_fired, 1);
         },
 
         test_remove(assert) {

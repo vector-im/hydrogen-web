@@ -34,8 +34,8 @@ Object.assign(BaseObservableMap.prototype, {
         return new SortedMapList(this, comparator);
     },
 
-    mapValues(mapper) {
-        return new MappedMap(this, mapper);
+    mapValues(mapper, updater) {
+        return new MappedMap(this, mapper, updater);
     },
 
     filterValues(filter) {

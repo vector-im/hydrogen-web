@@ -28,6 +28,8 @@ import {EventEntry} from "./timeline/entries/EventEntry.js";
 import {ObservedEventMap} from "./ObservedEventMap.js";
 import {DecryptionSource} from "../e2ee/common.js";
 import {ensureLogItem} from "../../logging/utils.js";
+import {PowerLevels} from "./timeline/PowerLevels.js";
+import {RetainedObservableValue} from "../../observable/ObservableValue.js";
 
 const EVENT_ENCRYPTED_TYPE = "m.room.encrypted";
 
@@ -388,6 +390,42 @@ export class BaseRoom extends EventEmitter {
         return this._summary.data.membership;
     }
 
+    async _loadPowerLevels() {
+        const txn = await this._storage.readTxn([this._storage.storeNames.roomState]);
+        const powerLevelsState = await txn.roomState.get(this._roomId, "m.room.power_levels", "");
+        if (powerLevelsState) {
+            return new PowerLevels({
+                powerLevelEvent: powerLevelsState.event,
+                ownUserId: this._user.id,
+                membership: this.membership
+            });
+        }
+        const createState = await txn.roomState.get(this._roomId, "m.room.create", "");
+        if (createState) {
+            return new PowerLevels({
+                createEvent: createState.event,
+                ownUserId: this._user.id,
+                membership: this.membership
+            });
+        } else {
+            const membership = this.membership;
+            return new PowerLevels({ownUserId: this._user.id, membership});
+        }
+    }
+
+    async observePowerLevels() {
+        if (this._powerLevelLoading) { await this._powerLevelLoading; }
+        let observable = this._powerLevels;
+        if (!observable) {
+            this._powerLevelLoading = this._loadPowerLevels();
+            const powerLevels = await this._powerLevelLoading;
+            observable = new RetainedObservableValue(powerLevels, () => { this._powerLevels = null; });
+            this._powerLevels = observable;
+            this._powerLevelLoading = null;
+        }
+        return observable;
+    }
+
     enableSessionBackup(sessionBackup) {
         this._roomEncryption?.enableSessionBackup(sessionBackup);
         // TODO: do we really want to do this every time you open the app?
@@ -429,6 +467,7 @@ export class BaseRoom extends EventEmitter {
                 },
                 clock: this._platform.clock,
                 logger: this._platform.logger,
+                powerLevelsObservable: await this.observePowerLevels()
             });
             try {
                 if (this._roomEncryption) {

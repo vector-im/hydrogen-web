@@ -37,7 +37,9 @@ function allowsChild(parent, child) {
             // downside of the approach: both of these will control which tile is selected
             return type === "room" || type === "empty-grid-tile";
         case "room":
-            return type === "lightbox" || type === "details";
+            return type === "lightbox" || type === "right-panel";
+        case "right-panel":
+            return type === "details"|| type === "members";
         default:
             return false;
     }
@@ -85,6 +87,21 @@ function roomsSegmentWithRoom(rooms, roomId, path) {
     }
 }
 
+function pushRightPanelSegment(array, segment) {
+    array.push(new Segment("right-panel"));
+    array.push(new Segment(segment));
+}
+
+export function addPanelIfNeeded(navigation, panel, path) {
+    const segment = navigation.path.get(panel);
+    let _path = path;
+    if (segment?.value) {
+        _path = _path.with(navigation.segment("right-panel"));
+        _path = _path.with(segment)
+    }
+    return _path;
+}
+
 export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
     // substr(1) to take of initial /
     const parts = urlPath.substr(1).split("/");
@@ -114,7 +131,9 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
             }
             segments.push(new Segment("room", roomId));
             if (currentNavPath.get("details")?.value) {
-                segments.push(new Segment("details"));
+                pushRightPanelSegment(segments, "details");
+            } else if (currentNavPath.get("members")?.value) {
+                pushRightPanelSegment(segments, "members");
             }
         } else if (type === "last-session") {
             let sessionSegment = currentNavPath.get("session");
@@ -124,6 +143,8 @@ export function parseUrlPath(urlPath, currentNavPath, defaultSessionId) {
             if (sessionSegment) {
                 segments.push(sessionSegment);
             }
+        } else if (type === "details" || type === "members") {
+            pushRightPanelSegment(segments, type);
         } else {
             // might be undefined, which will be turned into true by Segment 
             const value = iterator.next().value;
@@ -152,6 +173,9 @@ export function stringifyPath(path) {
                     urlPath += `/${segment.type}/${segment.value}`;
                 }
                 break;
+            case "right-panel":
+                // Ignore right-panel in url
+                continue;
             default:
                 urlPath += `/${segment.type}`;
                 if (segment.value && segment.value !== true) {
@@ -184,6 +208,18 @@ export function tests() {
             ]);
             const urlPath = stringifyPath(path);
             assert.equal(urlPath, "/session/1/rooms/a,b,c/1");
+        },
+        "stringify url with right-panel and details segment": assert => {
+            const nav = new Navigation(allowsChild);
+            const path = nav.pathFrom([
+                new Segment("session", 1),
+                new Segment("rooms", ["a", "b", "c"]),
+                new Segment("room", "b"),
+                new Segment("right-panel"),
+                new Segment("details")
+            ]);
+            const urlPath = stringifyPath(path);
+            assert.equal(urlPath, "/session/1/rooms/a,b,c/1/details");
         },
         "parse grid url path with focused empty tile": assert => {
             const segments = parseUrlPath("/session/1/rooms/a,b,c/3");
@@ -263,18 +299,21 @@ export function tests() {
                 new Segment("session", 1),
                 new Segment("rooms", ["a", "b", "c"]),
                 new Segment("room", "b"),
+                new Segment("right-panel", true),
                 new Segment("details", true)
             ]);
             const segments = parseUrlPath("/session/1/open-room/a", path);
-            assert.equal(segments.length, 4);
+            assert.equal(segments.length, 5);
             assert.equal(segments[0].type, "session");
             assert.equal(segments[0].value, "1");
             assert.equal(segments[1].type, "rooms");
             assert.deepEqual(segments[1].value, ["a", "b", "c"]);
             assert.equal(segments[2].type, "room");
             assert.equal(segments[2].value, "a");
-            assert.equal(segments[3].type, "details");
+            assert.equal(segments[3].type, "right-panel");
             assert.equal(segments[3].value, true);
+            assert.equal(segments[4].type, "details");
+            assert.equal(segments[4].value, true);
         },
         "parse open-room action setting a room in an empty tile": assert => {
             const nav = new Navigation(allowsChild);

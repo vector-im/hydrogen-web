@@ -42,10 +42,10 @@ export class PowerLevels {
         if (this._membership !== "join") {
             return Number.MIN_SAFE_INTEGER;
         }
-        return this._getUserLevel(this._ownUserId);
+        return this.getUserLevel(this._ownUserId);
     }
 
-    _getUserLevel(userId) {
+    getUserLevel(userId) {
         if (this._plEvent) {
             let userLevel = this._plEvent.content?.users?.[userId];
             if (typeof userLevel !== "number") {

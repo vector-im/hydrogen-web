@@ -865,3 +865,20 @@ button.link {
 .RoomDetailsView .close {
     background-image: url("./icons/clear.svg");
 }
+
+/* Memberlist Panel */
+
+.MemberTileView {
+    margin-top: 8px;
+}
+
+.MemberTileView .avatar {
+    margin-right: 8px;
+}
+
+.MemberTileView_name {
+    text-overflow: ellipsis;
+    overflow: clip;
+    width: 184px;
+    white-space: nowrap;
+}

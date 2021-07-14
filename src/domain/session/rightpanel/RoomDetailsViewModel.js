@@ -9,6 +9,10 @@ export class RoomDetailsViewModel extends ViewModel {
         this._room.on("change", this._onRoomChange);
     }
 
+    get type() {
+        return "room-details";
+    }
+
     get roomId() {
         return this._room.id;
     }
