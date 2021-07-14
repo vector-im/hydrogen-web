@@ -404,11 +404,14 @@ export class BaseRoom extends EventEmitter {
     }
 
     async observePowerLevels() {
+        if (this._powerLevelLoading) { await this._powerLevelLoading; }
         let observable = this._powerLevels;
         if (!observable) {
-            const powerLevels = await this._loadPowerLevels();
+            this._powerLevelLoading = this._loadPowerLevels();
+            const powerLevels = await this._powerLevelLoading;
             observable = new RetainedObservableValue(powerLevels, () => { this._powerLevels = null; });
             this._powerLevels = observable;
+            this._powerLevelLoading = null;
         }
         return observable;
     }
