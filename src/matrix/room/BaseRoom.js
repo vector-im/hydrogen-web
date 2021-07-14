@@ -28,7 +28,6 @@ import {EventEntry} from "./timeline/entries/EventEntry.js";
 import {ObservedEventMap} from "./ObservedEventMap.js";
 import {DecryptionSource} from "../e2ee/common.js";
 import {ensureLogItem} from "../../logging/utils.js";
-import {TimelineReader} from "./timeline/persistence/TimelineReader.js";
 import {PowerLevels} from "./timeline/PowerLevels.js";
 import {RetainedObservableValue} from "../../observable/ObservableValue.js";
 
@@ -382,14 +381,7 @@ export class BaseRoom extends EventEmitter {
     }
 
     async loadPowerLevels() {
-        const timelineReader = new TimelineReader({
-            roomId: this._roomId,
-            storage: this._storage,
-            fragmentIdComparer: this._fragmentIdComparer
-        });
-        const txn = await this._storage.readTxn(
-            timelineReader.readTxnStores.concat(this._storage.storeNames.roomMembers, this._storage.storeNames.roomState)
-        );
+        const txn = await this._storage.readTxn([this._storage.storeNames.roomState]);
         const powerLevelsState = await txn.roomState.get(this._roomId, "m.room.power_levels", "");
         if (powerLevelsState) {
             return new PowerLevels({
